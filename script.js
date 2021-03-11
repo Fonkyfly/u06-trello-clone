@@ -185,7 +185,7 @@ $(()=>{
 
 
 
-
+        // testkommentar
             
         //     // Här kan vi sätta konfiguration efter widgeten är initialiserad
         //     _setOption: function( key, value ) {},
