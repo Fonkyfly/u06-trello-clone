@@ -184,7 +184,7 @@ $(()=>{
         //$("#bodyEffect").
 
 
-
+        var hej = "hej";
         // testkommentar
             
         //     // Här kan vi sätta konfiguration efter widgeten är initialiserad
