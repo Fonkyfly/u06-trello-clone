@@ -51,8 +51,11 @@ $(()=>{
             }
             
         }
-
+        // Definiera variabler till effekt och widget
+        var partyToggle = false;
         var state = true;
+
+        // Effekt
         $( "#effectButton" ).on( "click", function() {
             if (state) {
                 $("#bodyEffect").animate({
@@ -80,123 +83,80 @@ $(()=>{
             connectWith: "ul.droppable",
         })
 
+        // Gör det lättare att kunna flytta elementen eftersom texten inte kan markeras.
         $( "#doList, #doingList, #doneList" ).disableSelection();
 
-        // Draggable & droppable
-        // $('.todoListItem').draggable();
 
-        // $('#doList').droppable(
-        //     {
-        //     accept: "#todoListItem",
-        //     drop: function()
-        //     {
-        //         console.log("drop");
-        //     }
-        // }
-        // )
 
-        // $('#doingList').droppable(
-        //     {
-        //     accept: "#todoListItem",
-        //     drop: function()
-        //     {
-        //         console.log("drop");
-        //     }
-        // }
-        // )
+        $.widget('custom.colorParty',{
 
-        // $('#doneList').droppable(
-        //     {
-        //     accept: "#todoListItem",
-        //     drop: function()
-        //     {
-        //         console.log("drop");
-        //     }
-        // }
-        // )
-
-        // Skapa en widget med jquery UI:s widget factory, ge widgeten ett namespace
-        $.widget("color.party", {
-
-            // Här definierar vi olika inställningar för widgeten
-            options: {
-                red: 200,
-                green: 200,
-                blue: 200,
-                change: null,
-                random: null
-            },
-            
-            // Här definierar pluginens logik
             _create: function() {
-                this.element.addClass("color-party");
-                this.activator = $("<button>", {
-                    text: "Party hard!",
-                    "class": "color-party-activator"
-                })
+                // Lägg till klass till objektet så färg kan ändras
+                this.element
+                    .addClass('colorParty')
+                    // .text(colorList);
 
-                .appendTo(this.element).button();
+                // Skapa knapp som kan sätta igång partyt
+                this.changer = $( "<button>", {
+                    text: "Start the party",
+                    "class": "custom-colorize-changer"
+                    })
+                    .appendTo(this.element)
+                    .button();
+                
+                // När knappen trycks aktiveras eller återställs widgeten
+                this.changer.on( "click", function () {
+                        if (partyToggle == false) {
+                            partyToggle = true;
+                            $(".custom-colorize-changer").text("Turn the party OFF!");
+                        } else {
+                            partyToggle = false;
+                            $(".colorParty").css("background-color", "rgb(138, 43, 226)"
+                            );
+                            $(".custom-colorize-changer").text("Turn the party ON!");
+                        }
+                        $(".colorParty").colorParty("refresh");
+                    },
+                  );
+                  this.refresh();
+                },
 
-                this.on(this.activator, {
-                    click: "activate"
-                })
-
-                this._refresh();
-            },
-
-            _refresh: function () {
-                this.element.css("background-color", "rgb("+
-                this.options.red + "." +
-                this.options.green + "." +
-                this.options.blue + ")"
-                );
-                this._trigger("change");
+            // Slumpar fram nya bakgrundsfärger
+            refresh: function() {
+                if (partyToggle == true) {
+                    var colors = {
+                        red: Math.floor( Math.random() * 256 ),
+                        green: Math.floor( Math.random() * 256 ),
+                        blue: Math.floor( Math.random() * 256 )
+                    }
+                    $(".colorParty").css("background-color", "rgb("+
+                    colors.red+", "+
+                    colors.green+", "+
+                    colors.blue+")"
+                    );
+                }
             },
 
             random: function(event) {
                 var colors = {
-                    red: Math.floor(Math.random()*256),
-                    green: Math.floor(Math.random()*256),
-                    blue: Math.floor(Math.random()*256)
-                };
-                
-                if (this.trigger("random", event, colors) !== false) {
-                    this.option(colors);
+                    red: Math.floor( Math.random() * 256 ),
+                    green: Math.floor( Math.random() * 256 ),
+                    blue: Math.floor( Math.random() * 256 )
                 }
+                this.options(colors);
             },
 
-            destroy: function() {
+            _destroy: function() {
                 this.changer.remove();
-                this.element.removeClass("custom-colorize").enableSelection().css("background-color", "transparent");
+                this.element
+                    .removeClass("colorParty")
+                    .enableSelection()
+                    .css("background-color", "transparent");
             },
+        });
 
-            setOptions: function () {
-                this.superApply(arguments);
-                this._refresh();
-                if (/red|green|blue/.test(key) && value < 0 || value > 255) {
-                    return;
-                }
-                this.super(key, value);
-                }
-            });
-
-        // INITIERA WIDGET, GÖR OM SÅ ATT DET BLIR PARTY VARJE SEKUND
-        //$("#bodyEffect").
-
-
-        var hej = "hej";
-        // testkommentar
-            
-        //     // Här kan vi sätta konfiguration efter widgeten är initialiserad
-        //     _setOption: function( key, value ) {},
-            
-        //     // Här säger vi till hur elementet vi kopplar vår widget på ska uppdateras
-        //     _refresh: function() {},
-            
-        //     // Här kan vi säga till hur elementet som har widgeten applicerad på sig ska tas bort
-        //     _destroy: function() {}
-        // });
-        
+        $(document.body).colorParty();
+                
         $('.todoItem').each(function () {
             // Options för dialogrutan
             var opt = {
@@ -216,7 +176,9 @@ $(()=>{
             $(this).dialog(opt);
         })
 
-
+        setInterval(function() {
+            $(".colorParty").colorParty("refresh");
+        }, 300);
         
         // Opener definieras med klick
         $(".opener" ).on( "click", function () {
